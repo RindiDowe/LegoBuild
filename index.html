@@ -152,6 +152,13 @@
       font-size:.95rem;
       padding:0 .4rem;
     }
+    #target-word-text{
+      font-weight:800;
+      letter-spacing:.2em;
+      text-align:center;
+      margin:0 0 .45rem;
+      color:#4b5563;
+    }
 
     #build-row{
       display:flex;
@@ -169,7 +176,7 @@
       flex:0 0 auto;
       position:relative;
       overflow:hidden;
-      /* LEGO baseplate dots */
+      /* LEGO baseplate studs */
       background-color:#f3f4f6;
       background-image:
         radial-gradient(circle,#d1d5db 22%,transparent 24%),
@@ -182,21 +189,6 @@
     .slot.filled{
       border-color:#4ade80;
       box-shadow:0 0 0 3px #bbf7d0;
-    }
-
-    .slot-letter{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:2rem;
-      font-weight:900;
-      color:#4b5563;
-      text-shadow:0 2px 0 #f9fafb;
-      pointer-events:none;
-      mix-blend-mode:multiply;
-      text-transform:uppercase;
     }
 
     .slot-spot{
@@ -235,13 +227,14 @@
       min-height:3.6rem;
     }
 
+    /* LEGO bricks – rainbow 2x4 style */
     .brick{
-      width:3.2rem;
-      height:3.2rem;
-      border-radius:1rem;
-      background:linear-gradient(145deg,#fecaca,#f97373);
-      box-shadow:0 6px 0 #b91c1c,0 9px 16px rgba(148,27,45,.45);
-      border:2px solid #fee2e2;
+      width:3.6rem;
+      height:2.2rem;
+      border-radius:.7rem;
+      background:var(--brick-color,#f97373);
+      box-shadow:0 6px 0 rgba(15,23,42,.35),0 9px 16px rgba(15,23,42,.25);
+      border:2px solid rgba(248,250,252,.9);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -252,22 +245,21 @@
     .brick:active{
       cursor:grabbing;
       transform:translateY(1px);
-      box-shadow:0 4px 0 #b91c1c,0 7px 14px rgba(148,27,45,.55);
+      box-shadow:0 4px 0 rgba(15,23,42,.35),0 7px 14px rgba(15,23,42,.35);
     }
-    /* studs on bricks */
     .brick::before,
     .brick::after{
       content:"";
       position:absolute;
-      width:70%;
-      height:26%;
+      width:78%;
+      height:28%;
       border-radius:999px;
       border:3px dotted rgba(248,250,252,.95);
       left:50%;
       transform:translateX(-50%);
     }
-    .brick::before{ top:13%; }
-    .brick::after { bottom:13%; }
+    .brick::before{ top:10%; }
+    .brick::after { bottom:10%; }
 
     /* TYPE SECTION */
     .type-section{
@@ -343,10 +335,9 @@
         width:3rem;
         height:3rem;
       }
-      .slot-letter{ font-size:1.7rem; }
       .brick{
-        width:3rem;
-        height:3rem;
+        width:3.2rem;
+        height:2rem;
       }
       .bottom-row{
         flex-direction:column-reverse;
@@ -380,14 +371,17 @@
         </div>
 
         <div class="build-area">
-          <p class="build-label">Build (color in) this LEGO word:</p>
+          <p class="build-label">
+            Build (color in) this LEGO word:
+          </p>
+          <p id="target-word-text"></p>
           <div id="build-row"></div>
         </div>
 
         <div class="letter-bank-wrap">
           <div class="bank-label">
             <span>Blocks</span>
-            <span style="font-size:.8rem;">Drag the blocks onto each letter.</span>
+            <span style="font-size:.8rem;">Drag the blocks onto each letter tile.</span>
           </div>
           <div id="letter-bank" class="letter-bank"></div>
         </div>
@@ -423,6 +417,16 @@
       1: ["sled","bells","candy","lights","frost"]
     };
 
+    const brickPalette = [
+      "#f97373", // red
+      "#fb923c", // orange
+      "#facc15", // yellow
+      "#22c55e", // green
+      "#38bdf8", // blue
+      "#a855f7", // purple
+      "#f472b6"  // pink
+    ];
+
     let currentGrade = "K";
     let words = [];
     let currentIndex = 0;
@@ -434,6 +438,7 @@
     const gradeLabel    = document.getElementById("grade-label");
     const wordIndexEl   = document.getElementById("word-index");
     const wordTotalEl   = document.getElementById("word-total");
+    const targetWordText= document.getElementById("target-word-text");
     const buildRow      = document.getElementById("build-row");
     const letterBank    = document.getElementById("letter-bank");
     const typeSection   = document.getElementById("type-section");
@@ -473,6 +478,7 @@
     function loadWord(){
       currentWord = words[currentIndex];
       wordIndexEl.textContent = currentIndex + 1;
+      targetWordText.textContent = currentWord.toUpperCase();
       messageEl.textContent = "";
       typeFeedback.textContent = "";
       typeFeedback.className = "";
@@ -482,25 +488,18 @@
 
       buildRow.innerHTML = "";
       letterBank.innerHTML = "";
+      brickIdCounter = 0;
 
-      // LEGO letter template: one slot per letter
+      // LEGO letter template: one tile per letter
       for(let i=0;i<currentWord.length;i++){
-        const letter = currentWord[i].toUpperCase();
-
         const slot = document.createElement("div");
         slot.className = "slot";
         slot.dataset.index = i;
 
-        const letterSpan = document.createElement("span");
-        letterSpan.className = "slot-letter";
-        letterSpan.textContent = letter;
-
         const spot = document.createElement("div");
         spot.className = "slot-spot";
 
-        slot.appendChild(letterSpan);
         slot.appendChild(spot);
-
         slot.addEventListener("dragover", handleDragOver);
         slot.addEventListener("drop", handleDropOnSlot);
 
@@ -515,7 +514,7 @@
       }
 
       messageEl.textContent =
-        "Drag the blocks onto each letter to color in the word.";
+        "Drag the colorful blocks onto each LEGO tile.";
     }
 
     function createBrick(){
@@ -524,6 +523,11 @@
       brick.draggable = true;
       brickIdCounter++;
       brick.id = "brick-" + brickIdCounter;
+
+      // rainbow colors like the screenshot
+      const color = brickPalette[(brickIdCounter - 1) % brickPalette.length];
+      brick.style.setProperty("--brick-color", color);
+
       brick.addEventListener("dragstart", handleDragStart);
       brick.addEventListener("dragend", handleDragEnd);
       return brick;
