@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Build & Type: Christmas / Winter Words</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#f3f4ff;
+      --card:#ffffff;
+      --ink:#111827;
+      --accent:#b91c1c;   /* red */
+      --accent-2:#065f46; /* green */
+      --muted:#6b7280;
+      --good:#15803d;
+      --bad:#b91c1c;
+      --slot:#e5e7eb;
+    }
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: radial-gradient(circle at top,#fef9c3,#e0f2fe 40%,#e5e7eb 80%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:1rem;
+      color:var(--ink);
+    }
+
+    .app{
+      width:100%;
+      max-width:900px;
+    }
+
+    h1{
+      text-align:center;
+      margin:0 0 .5rem;
+      font-size:clamp(1.6rem,3vw,2.1rem);
+    }
+    .tagline{
+      text-align:center;
+      margin:0 0 1rem;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:1rem;
+      padding:1rem 1.25rem 1.25rem;
+      box-shadow:0 14px 28px rgba(15,23,42,.18);
+      border:3px solid #fed7d7;
+    }
+
+    .top-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:.5rem;
+      margin-bottom:1rem;
+    }
+
+    .badge{
+      padding:.3rem .7rem;
+      border-radius:999px;
+      background:#fee2e2;
+      border:1px solid #fecaca;
+      font-size:.8rem;
+      font-weight:600;
+      display:inline-flex;
+      align-items:center;
+      gap:.25rem;
+    }
+
+    .hidden{display:none;}
+
+    #start-screen{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:.75rem;
+      padding:1.25rem 0;
+    }
+
+    .btn{
+      border:none;
+      border-radius:.75rem;
+      padding:.7rem 1.4rem;
+      font-size:1rem;
+      font-weight:600;
+      cursor:pointer;
+      background:linear-gradient(135deg,var(--accent),#f97316);
+      color:white;
+      box-shadow:0 10px 20px rgba(0,0,0,.18);
+      display:inline-flex;
+      align-items:center;
+      gap:.4rem;
+    }
+    .btn.secondary{
+      background:linear-gradient(135deg,var(--accent-2),#22c55e);
+    }
+    .btn.small{
+      padding:.45rem .9rem;
+      font-size:.85rem;
+      box-shadow:none;
+    }
+    .btn[disabled]{
+      opacity:.6;
+      cursor:default;
+      box-shadow:none;
+    }
+
+    .build-area{
+      border-radius:.75rem;
+      border:2px dashed #e5e7eb;
+      padding:.75rem;
+      background:#f9fafb;
+      margin-bottom:.75rem;
+    }
+
+    .build-label{
+      font-weight:600;
+      margin-bottom:.3rem;
+      font-size:.95rem;
+    }
+
+    #target-word{
+      font-size:1.4rem;
+      font-weight:700;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      color:var(--muted);
+      text-align:center;
+      margin-bottom:.45rem;
+    }
+
+    .build-row{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:.4rem;
+      margin-bottom:.4rem;
+    }
+
+    .slot{
+      width:2.5rem;
+      height:2.5rem;
+      border-radius:.5rem;
+      background:var(--slot);
+      border:3px solid #d1d5db;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      box-shadow:inset 0 0 0 3px #e5e7eb;
+    }
+    .slot::before{
+      content:"";
+      width:70%;
+      height:70%;
+      border-radius:.45rem;
+      border:4px dotted rgba(148,163,184,.6);
+      box-sizing:border-box;
+    }
+    .slot.filled{
+      background:#fef2f2;
+    }
+
+    .letter-bank-wrap{
+      margin-top:.3rem;
+    }
+
+    .bank-label{
+      font-weight:600;
+      font-size:.9rem;
+      margin-bottom:.25rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:var(--muted);
+    }
+
+    .letter-bank{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.4rem;
+      justify-content:center;
+      padding:.5rem;
+      border-radius:.75rem;
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      min-height:3rem;
+    }
+
+    .brick{
+      width:2.5rem;
+      height:2.5rem;
+      border-radius:.6rem;
+      background:linear-gradient(145deg,#fecaca,#fb7185);
+      box-shadow:0 4px 0 #b91c1c,0 6px 10px rgba(148,27,45,.45);
+      border:2px solid #fee2e2;
+      color:#111827;
+      font-weight:800;
+      font-size:1.3rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-transform:uppercase;
+      cursor:grab;
+      position:relative;
+    }
+    .brick:active{cursor:grabbing;transform:translateY(1px);box-shadow:0 3px 0 #b91c1c,0 5px 8px rgba(148,27,45,.45);}
+    .brick::before,.brick::after{
+      content:"";
+      position:absolute;
+      width:65%;
+      height:26%;
+      border-radius:999px;
+      border:3px dotted rgba(248,250,252,.9);
+      left:50%;
+      transform:translateX(-50%);
+    }
+    .brick::before{top:14%;}
+    .brick::after{bottom:14%;}
+
+    .type-section{
+      margin-top:.9rem;
+      border-radius:.75rem;
+      padding:.75rem;
+      background:#ecfdf5;
+      border:1px solid #a7f3d0;
+    }
+    .type-section h3{
+      margin:.1rem 0 .4rem;
+      font-size:1rem;
+    }
+    .type-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.5rem;
+      align-items:center;
+    }
+    #type-input{
+      flex:1;
+      min-width:130px;
+      padding:.5rem .7rem;
+      border-radius:.6rem;
+      border:2px solid #6ee7b7;
+      font-size:1rem;
+    }
+    #type-input:focus{
+      outline:none;
+      border-color:#22c55e;
+      box-shadow:0 0 0 2px rgba(34,197,94,.4);
+    }
+
+    #type-feedback{
+      margin-top:.3rem;
+      font-weight:600;
+      font-size:.9rem;
+    }
+    #type-feedback.good{color:var(--good);}
+    #type-feedback.bad{color:var(--bad);}
+
+    #message{
+      margin-top:.6rem;
+      font-weight:600;
+      text-align:center;
+      font-size:.95rem;
+      color:var(--muted);
+    }
+
+    .finish{
+      text-align:center;
+      font-size:1.1rem;
+      font-weight:600;
+      padding:.7rem 0 .2rem;
+    }
+
+    @media (max-width:600px){
+      .brick,.slot{
+        width:2.2rem;
+        height:2.2rem;
+      }
+      #target-word{font-size:1.2rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Build & Type: Christmas & Winter Words</h1>
+    <p class="tagline">Drag the LEGO-style bricks to build the word, then type it!</p>
+
+    <div class="card">
+      <!-- START SCREEN -->
+      <div id="start-screen">
+        <p style="text-align:center;margin:0 0 .6rem;">
+          Choose a level to begin:
+        </p>
+        <button class="btn" data-grade="K">🎄 Kindergarten Words</button>
+        <button class="btn secondary" data-grade="1">☃️ 1st Grade Words</button>
+      </div>
+
+      <!-- GAME SCREEN -->
+      <div id="game" class="hidden">
+        <div class="top-row">
+          <span class="badge" id="grade-label"></span>
+          <span class="badge">Word <span id="word-index">1</span>/<span id="word-total">5</span></span>
+        </div>
+
+        <div class="build-area">
+          <div class="build-label">Build this word:</div>
+          <div id="target-word"></div>
+          <div class="build-row" id="build-row"></div>
+        </div>
+
+        <div class="letter-bank-wrap">
+          <div class="bank-label">
+            <span>Letter bricks</span>
+            <span style="font-size:.8rem;">Drag into the boxes above.</span>
+          </div>
+          <div id="letter-bank" class="letter-bank"></div>
+        </div>
+
+        <div id="type-section" class="type-section hidden">
+          <h3>Now type the word:</h3>
+          <div class="type-row">
+            <input id="type-input" type="text" autocomplete="off" />
+            <button id="check-typed" class="btn small">Check</button>
+          </div>
+          <div id="type-feedback"></div>
+        </div>
+
+        <div id="message"></div>
+
+        <div style="margin-top:.8rem;display:flex;justify-content:space-between;gap:.5rem;">
+          <button id="reset-word" class="btn small secondary">Reset Word</button>
+          <button id="next-word" class="btn small hidden">Next Word ➜</button>
+        </div>
+
+        <div id="finish-screen" class="hidden">
+          <p class="finish">✨ Snow-tastic work! You finished all the words. ✨</p>
+          <div style="text-align:center;margin-bottom:.3rem;">
+            <button id="play-again" class="btn small">Play Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple Christmas / winter word lists
+    const wordSets = {
+      K: ["joy","elf","hat","snow","tree"],
+      1: ["sled","bells","candy","lights","frost"]
+    };
+
+    let currentGrade = "K";
+    let words = [];
+    let currentIndex = 0;
+    let currentWord = "";
+    let brickIdCounter = 0;
+
+    const startScreen   = document.getElementById("start-screen");
+    const gameScreen    = document.getElementById("game");
+    const gradeLabel    = document.getElementById("grade-label");
+    const wordIndexEl   = document.getElementById("word-index");
+    const wordTotalEl   = document.getElementById("word-total");
+    const targetWordEl  = document.getElementById("target-word");
+    const buildRow      = document.getElementById("build-row");
+    const letterBank    = document.getElementById("letter-bank");
+    const typeSection   = document.getElementById("type-section");
+    const typeInput     = document.getElementById("type-input");
+    const checkTypedBtn = document.getElementById("check-typed");
+    const typeFeedback  = document.getElementById("type-feedback");
+    const messageEl     = document.getElementById("message");
+    const resetBtn      = document.getElementById("reset-word");
+    const nextBtn       = document.getElementById("next-word");
+    const finishScreen  = document.getElementById("finish-screen");
+    const playAgainBtn  = document.getElementById("play-again");
+
+    // Start buttons (grade selection)
+    document.querySelectorAll("#start-screen .btn").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        currentGrade = btn.dataset.grade;
+        startGame();
+      });
+    });
+
+    function startGame(){
+      words = [...wordSets[currentGrade]];
+      currentIndex = 0;
+      wordTotalEl.textContent = words.length;
+      gradeLabel.textContent = (currentGrade === "K" ? "Kindergarten" : "1st Grade") + " list";
+      startScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      finishScreen.classList.add("hidden");
+      loadWord();
+    }
+
+    function loadWord(){
+      currentWord = words[currentIndex];
+      wordIndexEl.textContent = currentIndex+1;
+      messageEl.textContent = "";
+      typeFeedback.textContent = "";
+      typeFeedback.className = "";
+      typeSection.classList.add("hidden");
+      nextBtn.classList.add("hidden");
+      typeInput.value = "";
+      buildRow.innerHTML = "";
+      letterBank.innerHTML = "";
+
+      // Show faint target word
+      targetWordEl.textContent = currentWord.toUpperCase();
+
+      // Create slots
+      for(let i=0;i<currentWord.length;i++){
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        slot.dataset.index = i;
+        slot.addEventListener("dragover",handleDragOver);
+        slot.addEventListener("drop",handleDropOnSlot);
+        buildRow.appendChild(slot);
+      }
+
+      // Create bricks: one for each letter (including repeats)
+      const letters = currentWord.split("");
+      // Add 2 random extra letters as "distractors"
+      const alphabet = "abcdefghijklmnopqrstuvwxyz";
+      for(let i=0;i<2;i++){
+        letters.push(alphabet[Math.floor(Math.random()*alphabet.length)]);
+      }
+      shuffleArray(letters);
+      letters.forEach(letter=>{
+        const brick = createBrick(letter);
+        letterBank.appendChild(brick);
+      });
+
+      messageEl.textContent = "Build the word by dragging the bricks into the boxes.";
+    }
+
+    function createBrick(letter){
+      const brick = document.createElement("div");
+      brick.className = "brick";
+      brick.textContent = letter;
+      brick.draggable = true;
+      brick.dataset.letter = letter;
+      brickIdCounter++;
+      brick.id = "brick-"+brickIdCounter;
+      brick.addEventListener("dragstart",handleDragStart);
+      brick.addEventListener("dragend",handleDragEnd);
+      // Allow dragging back to bank
+      letterBank.addEventListener("dragover",handleDragOver);
+      letterBank.addEventListener("drop",handleDropOnBank);
+      return brick;
+    }
+
+    function handleDragStart(e){
+      e.dataTransfer.setData("text/plain", e.target.id);
+      setTimeout(()=>{ e.target.style.opacity = "0.4"; },0);
+    }
+
+    function handleDragEnd(e){
+      e.target.style.opacity = "1";
+    }
+
+    function handleDragOver(e){
+      e.preventDefault();
+    }
+
+    function handleDropOnSlot(e){
+      e.preventDefault();
+      const slot = e.currentTarget;
+      const brickId = e.dataTransfer.getData("text/plain");
+      const brick = document.getElementById(brickId);
+      if(!brick) return;
+
+      // If slot already has a brick, send it back to bank first
+      if(slot.firstElementChild){
+        letterBank.appendChild(slot.firstElementChild);
+      }
+      slot.innerHTML = "";
+      slot.appendChild(brick);
+      slot.classList.add("filled");
+      checkBuiltWord();
+    }
+
+    function handleDropOnBank(e){
+      e.preventDefault();
+      const brickId = e.dataTransfer.getData("text/plain");
+      const brick = document.getElementById(brickId);
+      if(!brick) return;
+      letterBank.appendChild(brick);
+      // remove filled styling from any slot that lost brick
+      document.querySelectorAll(".slot").forEach(slot=>{
+        if(!slot.firstElementChild){
+          slot.classList.remove("filled");
+        }
+      });
+      checkBuiltWord(); // may no longer be complete
+    }
+
+    function checkBuiltWord(){
+      const slots = Array.from(document.querySelectorAll(".slot"));
+      let built = "";
+      for(const slot of slots){
+        const brick = slot.firstElementChild;
+        if(!brick){
+          messageEl.textContent = "Keep building...";
+          return;
+        }
+        built += brick.dataset.letter;
+      }
+      if(built.toLowerCase() === currentWord.toLowerCase()){
+        messageEl.textContent = "Nice building! ✅ Now type the word.";
+        typeSection.classList.remove("hidden");
+        typeInput.focus();
+      }else{
+        messageEl.textContent = "Those bricks make \""+built.toUpperCase()+"\". Try again!";
+      }
+    }
+
+    checkTypedBtn.addEventListener("click",checkTypedWord);
+    typeInput.addEventListener("keydown",e=>{
+      if(e.key==="Enter") checkTypedWord();
+    });
+
+    function checkTypedWord(){
+      const typed = typeInput.value.trim().toLowerCase();
+      if(!typed) return;
+      if(typed === currentWord.toLowerCase()){
+        typeFeedback.textContent = "Great typing! 🎉";
+        typeFeedback.className = "good";
+        nextBtn.classList.remove("hidden");
+      }else{
+        typeFeedback.textContent = "Almost! Check your letters and try again.";
+        typeFeedback.className = "bad";
+        nextBtn.classList.add("hidden");
+      }
+    }
+
+    resetBtn.addEventListener("click",()=>{
+      loadWord();
+    });
+
+    nextBtn.addEventListener("click",()=>{
+      if(currentIndex < words.length-1){
+        currentIndex++;
+        loadWord();
+      }else{
+        finishScreen.classList.remove("hidden");
+        messageEl.textContent = "";
+        typeSection.classList.add("hidden");
+        nextBtn.classList.add("hidden");
+      }
+    });
+
+    playAgainBtn.addEventListener("click",()=>{
+      startScreen.classList.remove("hidden");
+      gameScreen.classList.add("hidden");
+    });
+
+    function shuffleArray(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+      }
+      return arr;
+    }
+  </script>
+</body>
+</html>
